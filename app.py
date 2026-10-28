@@ -149,6 +149,19 @@ TEMPLATES = {
 
 def extract_pdf_text(pdf_bytes):
     try:
+        import fitz  # PyMuPDF — 10x faster than pdfplumber
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        pages = []
+        for page in doc:
+            text = page.get_text()
+            if text.strip():
+                pages.append(text)
+        doc.close()
+        return "\n\n--- Page Break ---\n\n".join(pages)
+    except Exception:
+        pass
+    # Fallback to pdfplumber
+    try:
         import pdfplumber
         with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
             pages = []
