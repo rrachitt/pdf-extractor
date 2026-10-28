@@ -246,7 +246,7 @@ PDF TEXT:
 def call_gemini(prompt, api_key):
     import google.generativeai as genai
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash-lite")
+    model = genai.GenerativeModel("gemini-3.8-flash")
     try:
         response = model.generate_content(
             prompt,
