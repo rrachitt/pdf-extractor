@@ -225,7 +225,7 @@ def call_gemini(prompt, api_key):
         model = genai.GenerativeModel("gemini-3.6-flash")
 
         # Try up to 3 times per key
-        for retry in range(3):
+        for retry in range(1):
             try:
                 response = model.generate_content(
                     prompt,
@@ -247,7 +247,7 @@ def call_gemini(prompt, api_key):
                 if "429" in last_error or "quota" in last_error.lower() or "resource" in last_error.lower():
                     # Rate limited — wait and retry, or try next key
                     if retry < 2:
-                        time.sleep(3 * (retry + 1))  # 3s, 6s wait
+                        time.sleep(1)
                         continue
                     else:
                         # Move to next key
