@@ -271,6 +271,7 @@ def call_ai(prompt, sidebar_key=""):
             elif "JSON" in err or "json" in err:
                 return {"rows": [], "error": f"Invalid JSON from Groq"}
             else:
+                last_error = str(e)[:200]
                 continue
 
     # Then Gemini
@@ -296,7 +297,7 @@ def call_ai(prompt, sidebar_key=""):
         except Exception as e:
             return {"rows": [], "error": str(e)[:200]}
 
-    return {"rows": [], "error": "All API keys failed. Wait a minute and retry."}
+    return {"rows": [], "error": f"All keys failed. Last error: {last_error}"}
 
 
 # ═══════════════════════════════════════════════════
