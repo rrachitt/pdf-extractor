@@ -199,7 +199,7 @@ If the PDF has multiple entries, return one row per entry.
 FILE: {title}
 
 PDF TEXT:
-{text[:15000]}"""
+{text[:6000]}"""
     else:
         return f"""Extract ALL structured data from this PDF.
 
@@ -217,14 +217,14 @@ If multiple entries, return one row per entry.
 FILE: {title}
 
 PDF TEXT:
-{text[:15000]}"""
+{text[:6000]}"""
 
 
 # ── Groq API call (ultra fast) ──
 def call_groq(prompt, key):
     import urllib.request
     payload = json.dumps({
-        "model": "llama-3.3-70b-versatile",
+        "model": "llama-3.1-8b-instant",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.1,
         "max_tokens": 4000,
