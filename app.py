@@ -280,13 +280,8 @@ def call_ai(prompt, sidebar_key=""):
         try:
             return call_gemini(prompt, key)
         except Exception as e:
-            err = str(e)
-            if "429" in err or "quota" in err.lower():
-                continue
-            elif "JSON" in err or "json" in err:
-                return {"rows": [], "error": f"Invalid JSON from Gemini"}
-            else:
-                continue
+            last_error = f"Gemini: {str(e)[:200]}"
+            continue
 
     # Sidebar key as last resort
     if sidebar_key:
