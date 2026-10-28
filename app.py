@@ -7,12 +7,8 @@ st.set_page_config(page_title="ESC PLAN — PDF Data Extractor", page_icon="📄
 # ── Custom CSS for interactive UI ──
 st.markdown("""
 <style>
-/* ── Typography & Base ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 .block-container {max-width: 1100px; padding-top: 2rem;}
-
-/* ── Header ── */
 .brand-header {
     display: flex; align-items: center; gap: 20px; padding: 20px 28px;
     background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
@@ -29,8 +25,6 @@ st.markdown("""
     font: 600 11px monospace; padding: 4px 12px; border: 1px solid rgba(255,255,255,0.3);
     border-radius: 6px; color: rgba(255,255,255,0.7);
 }
-
-/* ── Cards ── */
 .ui-card {
     background: white; border: 1px solid #e5e7eb; border-radius: 14px;
     padding: 24px; margin-bottom: 16px; transition: box-shadow 0.2s;
@@ -38,8 +32,6 @@ st.markdown("""
 .ui-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 .ui-card h3 { font: 700 16px 'Inter', sans-serif; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
 .ui-card .desc { font-size: 13px; color: #6b7280; margin-bottom: 14px; }
-
-/* ── Stat boxes ── */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
 .stat-box {
     background: white; border: 1px solid #e5e7eb; border-radius: 12px;
@@ -52,60 +44,26 @@ st.markdown("""
 .stat-ok .stat-num { color: #059669; }
 .stat-failed .stat-num { color: #dc2626; }
 .stat-total .stat-num { color: #1e1b4b; }
-
-/* ── Template chips ── */
-.chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 16px; }
-.chip {
-    font: 500 13px 'Inter', sans-serif; padding: 6px 14px; border: 1px solid #e5e7eb;
-    border-radius: 20px; cursor: pointer; transition: all 0.15s; background: #f9fafb; color: #374151;
-}
-.chip:hover { border-color: #4f46e5; color: #4f46e5; background: #eef2ff; }
-
-/* ── Steps indicator ── */
-.steps-bar { display: flex; gap: 0; margin-bottom: 20px; }
-.step-item {
-    flex: 1; padding: 12px 16px; text-align: center; font: 600 13px 'Inter', sans-serif;
-    border-bottom: 3px solid #e5e7eb; color: #9ca3af; transition: all 0.2s;
-}
-.step-item.active { border-color: #4f46e5; color: #4f46e5; }
-.step-item.done { border-color: #059669; color: #059669; }
-.step-num { font: 700 11px 'Inter'; background: #e5e7eb; color: #6b7280; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px; }
-.step-item.active .step-num { background: #4f46e5; color: white; }
-.step-item.done .step-num { background: #059669; color: white; }
-
-/* ── Upload area ── */
 [data-testid="stFileUploader"] {
     border: 2px dashed #d1d5db !important; border-radius: 14px !important; padding: 8px !important;
 }
 [data-testid="stFileUploader"]:hover { border-color: #4f46e5 !important; }
-
-/* ── Buttons ── */
 .stButton > button[kind="primary"] {
     background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
     border: none !important; border-radius: 10px !important; padding: 12px 28px !important;
     font-weight: 600 !important; letter-spacing: 0.02em !important; transition: all 0.2s !important;
 }
 .stButton > button[kind="primary"]:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(79,70,229,0.35) !important; }
-
-/* ── Progress bar ── */
 .stProgress > div > div { background: linear-gradient(90deg, #4f46e5, #7c3aed) !important; border-radius: 4px !important; }
-
-/* ── Dataframe ── */
 [data-testid="stDataFrame"] { border-radius: 12px !important; overflow: hidden; }
-
-/* ── Download buttons ── */
 .stDownloadButton > button {
     border-radius: 10px !important; border: 1px solid #e5e7eb !important;
     font-weight: 600 !important; transition: all 0.15s !important;
 }
 .stDownloadButton > button:hover { border-color: #4f46e5 !important; color: #4f46e5 !important; }
-
-/* ── Dark mode ── */
 @media (prefers-color-scheme: dark) {
     .ui-card { background: #1f2937; border-color: #374151; }
     .stat-box { background: #1f2937; border-color: #374151; }
-    .chip { background: #1f2937; border-color: #374151; color: #d1d5db; }
-    .chip:hover { background: #312e81; border-color: #4f46e5; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -117,37 +75,49 @@ st.markdown("""
         <div class="brand-name">ESC PLAN</div>
         <div class="brand-sub">PDF Data Extractor — Extract any data from any PDF</div>
     </div>
-    <div class="brand-badge">v3.0</div>
+    <div class="brand-badge">v3.1</div>
 </div>
 """, unsafe_allow_html=True)
 
 # ── Session state ──
 if "results" not in st.session_state:
     st.session_state.results = []
-if "step" not in st.session_state:
-    st.session_state.step = 1
 if "field_text" not in st.session_state:
     st.session_state.field_text = ""
 
-# ── Load API key ──
+# ── Load secrets ──
 def get_secret(key):
     try:
         return st.secrets[key]
     except Exception:
         return os.environ.get(key, "")
 
+# ── Get all API keys (primary + backups) ──
+def get_all_keys(sidebar_key=""):
+    keys = []
+    primary = get_secret("GEMINI_API_KEY")
+    if primary:
+        keys.append(primary)
+    for i in range(2, 6):
+        k = get_secret(f"GEMINI_API_KEY_{i}")
+        if k:
+            keys.append(k)
+    if sidebar_key and sidebar_key not in keys:
+        keys.insert(0, sidebar_key)
+    return keys
+
 # ── Sidebar ──
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
-    saved_key = get_secret("GEMINI_API_KEY")
-    if saved_key:
-        st.success("✅ API key loaded")
-        api_key = saved_key
+    saved_keys = get_all_keys()
+    if saved_keys:
+        st.success(f"✅ {len(saved_keys)} API key(s) loaded")
+        api_key = saved_keys[0]
     else:
         api_key = st.text_input("🔑 Gemini API Key", type="password",
                                 help="Get yours FREE at aistudio.google.com/apikey")
         st.markdown("[Get free API key →](https://aistudio.google.com/apikey)")
-    
+
     st.divider()
     st.markdown("#### 📖 Quick Guide")
     st.markdown("""
@@ -158,7 +128,7 @@ with st.sidebar:
     💡 <b>Tip:</b> Leave fields blank to auto-detect everything in the PDF
     </div>
     """, unsafe_allow_html=True)
-    
+
     st.divider()
     st.markdown("""
     <div style="text-align:center;padding:8px;font-size:12px;color:#9ca3af">
@@ -242,33 +212,56 @@ PDF TEXT:
 {text[:18000]}"""
 
 
-# ── Call Gemini ──
+# ── Call Gemini with auto-retry and key rotation ──
 def call_gemini(prompt, api_key):
     import google.generativeai as genai
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-3.6-flash")
-    try:
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(temperature=0.1, max_output_tokens=4000)
-        )
-        raw = response.text
-        raw = re.sub(r"```json\s*", "", raw)
-        raw = re.sub(r"```\s*$", "", raw).strip()
-        return json.loads(raw)
-    except json.JSONDecodeError as e:
-        return {"rows": [], "error": f"Invalid JSON: {str(e)[:100]}"}
-    except Exception as e:
-        return {"rows": [], "error": str(e)[:200]}
+    keys = get_all_keys(api_key)
+    if not keys:
+        return {"rows": [], "error": "No API key configured"}
+
+    last_error = ""
+    for key_index, attempt_key in enumerate(keys):
+        genai.configure(api_key=attempt_key)
+        model = genai.GenerativeModel("gemini-3.8-flash")
+
+        # Try up to 3 times per key
+        for retry in range(3):
+            try:
+                response = model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.1,
+                        max_output_tokens=4000
+                    )
+                )
+                raw = response.text
+                raw = re.sub(r"```json\s*", "", raw)
+                raw = re.sub(r"```\s*$", "", raw).strip()
+                return json.loads(raw)
+
+            except json.JSONDecodeError as e:
+                return {"rows": [], "error": f"Invalid JSON: {str(e)[:100]}"}
+
+            except Exception as e:
+                last_error = str(e)[:200]
+                if "429" in last_error or "quota" in last_error.lower() or "resource" in last_error.lower():
+                    # Rate limited — wait and retry, or try next key
+                    if retry < 2:
+                        time.sleep(3 * (retry + 1))  # 3s, 6s wait
+                        continue
+                    else:
+                        # Move to next key
+                        break
+                else:
+                    # Non-rate-limit error — return immediately
+                    return {"rows": [], "error": last_error}
+
+    return {"rows": [], "error": f"All {len(keys)} API keys exhausted. Wait a minute and retry. Last error: {last_error}"}
 
 
 # ═══════════════════════════════════════════════════
-# MAIN UI — Steps
+# MAIN UI
 # ═══════════════════════════════════════════════════
-
-has_fields = bool(st.session_state.field_text.strip())
-has_files = False
-has_results = len(st.session_state.results) > 0
 
 # ── Step 1: Configure Fields ──
 st.markdown("""
@@ -278,7 +271,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Templates
 template_cols = st.columns(len(TEMPLATES))
 for i, (name, val) in enumerate(TEMPLATES.items()):
     with template_cols[i]:
@@ -302,7 +294,6 @@ if fields:
 else:
     st.info("💡 No fields specified — will auto-detect all data points from the PDFs")
 
-# Rules
 with st.expander("📝 Extraction instructions (optional — for complex PDF formats)"):
     rules = st.text_area(
         "rules",
@@ -329,7 +320,6 @@ uploaded_files = st.file_uploader(
 )
 
 if uploaded_files:
-    has_files = True
     file_info_cols = st.columns([3, 1])
     with file_info_cols[0]:
         st.success(f"✅ **{len(uploaded_files)} PDF(s)** ready to process")
@@ -361,18 +351,17 @@ with extract_col2:
     elif not uploaded_files:
         st.info("📁 Upload PDFs above to begin")
     else:
-        st.success("✅ Ready to extract!")
+        key_count = len(get_all_keys(api_key))
+        st.success(f"✅ Ready! Using {key_count} API key(s) with auto-rotation")
 
 if extract_btn and uploaded_files and api_key:
     all_results = []
-    
-    # Progress UI
     progress = st.progress(0)
     status_text = st.empty()
     stats_display = st.empty()
     live_log = st.empty()
-    
-    stats = {"extracted": 0, "failed": 0, "total_rows": 0}
+
+    stats = {"extracted": 0, "failed": 0}
     log_messages = []
 
     for i, pdf_file in enumerate(uploaded_files):
@@ -380,7 +369,6 @@ if extract_btn and uploaded_files and api_key:
         progress.progress(pct)
         status_text.markdown(f"**Processing [{i+1}/{len(uploaded_files)}]:** `{pdf_file.name}`")
 
-        # Extract text
         pdf_bytes = pdf_file.read()
         text = extract_pdf_text(pdf_bytes)
         char_count = len(text.replace(" ", ""))
@@ -407,10 +395,8 @@ if extract_btn and uploaded_files and api_key:
                     })
                     row_count += 1
                 stats["extracted"] += row_count
-                stats["total_rows"] += row_count
                 log_messages.append(f"✅ {pdf_file.name} — {row_count} row(s) extracted")
 
-        # Update live stats
         stats_display.markdown(f"""
         <div class="stat-grid">
             <div class="stat-box stat-total"><div class="stat-num">{i+1}/{len(uploaded_files)}</div><div class="stat-label">PDFs Processed</div></div>
@@ -419,9 +405,9 @@ if extract_btn and uploaded_files and api_key:
             <div class="stat-box stat-failed"><div class="stat-num">{stats['failed']}</div><div class="stat-label">Failed</div></div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         live_log.code("\n".join(log_messages[-8:]), language=None)
-        time.sleep(0.3)
+        time.sleep(0.5)
 
     progress.progress(1.0)
     status_text.markdown("### ✅ Extraction Complete!")
@@ -438,20 +424,18 @@ if st.session_state.results:
     st.markdown("""
     <div class="ui-card">
         <h3>📊 Results</h3>
-        <div class="desc">Your extracted data. Download as CSV or JSON.</div>
+        <div class="desc">Your extracted data. Download as CSV, JSON, or Excel.</div>
     </div>
     """, unsafe_allow_html=True)
 
     results = st.session_state.results
 
-    # Discover columns
     all_cols = []
     for r in results:
         for k in r["data"].keys():
             if not any(c.lower() == k.lower() for c in all_cols):
                 all_cols.append(k)
 
-    # Build table
     table_data = []
     for r in results:
         row = {"Source PDF": r["source"], "Status": r["status"]}
@@ -465,7 +449,6 @@ if st.session_state.results:
         row["Note"] = r.get("note", r.get("error", ""))
         table_data.append(row)
 
-    # Stats cards
     extracted = sum(1 for r in results if r["status"] == "EXTRACTED")
     failed = sum(1 for r in results if r["status"] in ("FAILED", "ERROR"))
     st.markdown(f"""
@@ -477,16 +460,12 @@ if st.session_state.results:
     </div>
     """, unsafe_allow_html=True)
 
-    # Tabs for views
     tab1, tab2 = st.tabs(["📋 Table View", "📄 Raw Data"])
-
     with tab1:
         st.dataframe(table_data, use_container_width=True, height=450)
-
     with tab2:
-        st.json(table_data[:20])  # Show first 20
+        st.json(table_data[:20])
 
-    # Downloads
     st.markdown("#### 📥 Download Results")
     dl_col1, dl_col2, dl_col3 = st.columns(3)
 
@@ -498,23 +477,12 @@ if st.session_state.results:
         writer.writerows(table_data)
 
     with dl_col1:
-        st.download_button(
-            "📥 Download CSV",
-            csv_buf.getvalue(),
-            file_name="esc_plan_extract.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
+        st.download_button("📥 Download CSV", csv_buf.getvalue(),
+                           file_name="esc_plan_extract.csv", mime="text/csv", use_container_width=True)
     with dl_col2:
-        st.download_button(
-            "📥 Download JSON",
-            json.dumps(table_data, indent=2, ensure_ascii=False),
-            file_name="esc_plan_extract.json",
-            mime="application/json",
-            use_container_width=True
-        )
+        st.download_button("📥 Download JSON", json.dumps(table_data, indent=2, ensure_ascii=False),
+                           file_name="esc_plan_extract.json", mime="application/json", use_container_width=True)
     with dl_col3:
-        # Excel download
         try:
             import openpyxl
             from openpyxl.styles import PatternFill, Font
@@ -532,17 +500,13 @@ if st.session_state.results:
                 ws.append([row.get(h, "") for h in headers])
             excel_buf = io.BytesIO()
             wb.save(excel_buf)
-            st.download_button(
-                "📥 Download Excel",
-                excel_buf.getvalue(),
-                file_name="esc_plan_extract.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
+            st.download_button("📥 Download Excel", excel_buf.getvalue(),
+                               file_name="esc_plan_extract.xlsx",
+                               mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                               use_container_width=True)
         except ImportError:
             st.button("📥 Excel (install openpyxl)", disabled=True, use_container_width=True)
 
-    # Clear results
     if st.button("🗑️ Clear results & start over"):
         st.session_state.results = []
         st.rerun()
