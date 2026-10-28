@@ -260,6 +260,7 @@ def call_gemini(prompt, key):
 
 # ── Smart caller with key rotation ──
 def call_ai(prompt, sidebar_key=""):
+    last_error = ""
     # Try Groq first (fastest)
     for key in groq_keys:
         try:
