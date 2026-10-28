@@ -222,7 +222,7 @@ def call_gemini(prompt, api_key):
     last_error = ""
     for key_index, attempt_key in enumerate(keys):
         genai.configure(api_key=attempt_key)
-        model = genai.GenerativeModel("gemini-3.8-flash")
+        model = genai.GenerativeModel("gemini-3.6-flash")
 
         # Try up to 3 times per key
         for retry in range(3):
